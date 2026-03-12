@@ -1,20 +1,15 @@
 # fuomo-Test
-
 Proyek ini berisi automated end-to-end test untuk website FUOMO menggunakan Playwright dan TypeScript. Pengujian mencakup validasi halaman homepage pada berbagai browser desktop maupun mobile.
 
 ---
-
 ## Daftar Isi
-
 - [Cara Setup Project](#cara-setup-project)
 - [Cara Menjalankan Test Secara Lokal](#cara-menjalankan-test-secara-lokal)
 - [Cara CI Menjalankan Test](#cara-ci-menjalankan-test)
 - [Strategi Testing](#strategi-testing)
-
 ---
 
 ## Cara Setup Project
-
 ### Prasyarat
 
 - Node.js versi LTS atau lebih baru
@@ -23,68 +18,49 @@ Proyek ini berisi automated end-to-end test untuk website FUOMO menggunakan Play
 ### Langkah Instalasi
 
 1. Clone repositori ini, lalu masuk ke direktori project:
-
-   ```bash
-   git clone <url-repositori>
+   git clone https://github.com/ilham1412/stage-FUOMO-TEST.git
    cd fuomo-Test
-   ```
 
 2. Install dependensi Node.js:
-
-   ```bash
    npm install
-   ```
-
+   
 3. Install browser yang dibutuhkan oleh Playwright:
-
-   ```bash
    npx playwright install --with-deps
-   ```
-
+   
 4. Buat file `.env` di root project berdasarkan file contoh yang tersedia:
-
-   ```bash
    cp .env.example .env
-   ```
 
    Kemudian isi nilai `BASE_URL` di dalam file `.env` dengan URL target yang ingin diuji:
-
    ```
    BASE_URL=https://example.com
    ```
 
 ---
-
 ## Cara Menjalankan Test Secara Lokal
 
 Pastikan file `.env` sudah dikonfigurasi dengan benar sebelum menjalankan test.
-
 Menjalankan semua test di semua browser:
 
 ```bash
 npx playwright test
+npx playwright test --ui
 ```
-
 Menjalankan test pada browser tertentu saja:
 
 ```bash
 npx playwright test --project=chromium
 npx playwright test --project=firefox
-npx playwright test --project=webkit
 ```
 
 Menjalankan test dalam mode debug (membuka browser secara visual):
-
 ```bash
 npx playwright test --debug
 ```
 
 Melihat laporan HTML setelah test selesai dijalankan:
-
 ```bash
 npx playwright show-report
 ```
-
 Hasil test juga tersedia dalam format JUnit XML di `test-results/junit.xml`.
 
 ---
@@ -107,7 +83,6 @@ CI dikonfigurasi menggunakan GitHub Actions melalui file `.github/workflows/play
 - Pull request yang menargetkan branch `main` atau `master`
 
 Tahapan yang dijalankan oleh CI:
-
 1. Checkout kode dari repositori
 2. Setup Node.js versi LTS
 3. Install dependensi menggunakan `npm ci`
@@ -116,29 +91,26 @@ Tahapan yang dijalankan oleh CI:
 6. Upload hasil laporan HTML sebagai artifact yang dapat diunduh, dengan retensi selama 30 hari
 
 Pada lingkungan CI, beberapa konfigurasi tambahan diberlakukan secara otomatis:
-
 - Test tidak diizinkan untuk menggunakan `.only` (forbidOnly aktif)
 - Setiap test gagal akan diulangi hingga 2 kali sebelum dianggap benar-benar gagal
 - Jumlah worker dibatasi menjadi 1 untuk menjaga stabilitas eksekusi
-
 ---
 
 ## Strategi Testing
-
 ### Pendekatan
 
 Proyek ini menggunakan pendekatan Page Object Model (POM). Setiap halaman yang diuji direpresentasikan sebagai sebuah kelas tersendiri di dalam folder `pages/`. Hal ini memisahkan logika interaksi halaman dari logika pengujian, sehingga test lebih mudah dibaca, dikelola, dan diperluas.
 
 ### Cakupan Test
-
 Test berfokus pada halaman homepage dan mencakup empat skenario utama:
 
 | Nama Test | Deskripsi |
 |---|---|
 | Page Loads Successfully | Memastikan halaman dapat diakses, mengembalikan status HTTP 200, dan judul halaman sesuai |
 | Validasi Elemen UI Utama | Memastikan elemen kunci seperti logo, navigasi, konten utama, dan footer tampil dengan benar |
-| Navigation Link Berfungsi | Memastikan menu Help mengarahkan pengguna ke halaman `/support` |
-| Creator Menu Berfungsi | Memastikan menu Creator mengarahkan pengguna ke halaman `/creators` |
+| Navigation Link help Berfungsi | Memastikan menu Help mengarahkan pengguna ke halaman `/support` |
+| Navigation Creator Menu Berfungsi | Memastikan menu Creator mengarahkan pengguna ke halaman `/creators` |
+
 
 ## Known Issues & Solusi
 ### Navigation Element Tidak Terdeteksi di Mobile Viewport
@@ -147,6 +119,11 @@ Test berfokus pada halaman homepage dan mencakup empat skenario utama:
 Saat menjalankan test menggunakan device mobile (Mobile Chrome / Mobile Safari),
 elemen navigasi seperti `a[aria-label="Go to Creators"]` tidak terdeteksi sebagai
 visible oleh Playwright, meskipun elemen terhitung ada di DOM (`count: 1`).
+
+```typescript
+console.log('count:', await creator.count()); 'count 1'
+console.log('isVisible:', await creator.isVisible()); 'false'
+```
 
 **Penyebab:**
 Website menggunakan dua versi navbar yang berbeda berdasarkan breakpoint Tailwind CSS:
@@ -181,6 +158,6 @@ yang digunakan oleh website.
 ### Pelaporan dan Artefak
 
 - **HTML Report**: Laporan interaktif yang dapat dibuka di browser, tersedia setelah test selesai
-- **JUnit XML**: Tersimpan di `test-results/junit.xml`, dapat diintegrasikan dengan tools pelaporan CI
+- **JUnit XML**: Tersimpan di `test-results/junit.xml`, tersedia setelah test selesai
 - **Trace**: Direkam pada percobaan ulang pertama untuk membantu debugging
 - **Screenshot**: Diambil secara otomatis hanya saat test gagal
