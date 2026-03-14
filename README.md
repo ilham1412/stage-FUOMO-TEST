@@ -161,3 +161,6 @@ yang digunakan oleh website.
 - **JUnit XML**: Tersimpan di `test-results/junit.xml`, tersedia setelah test selesai
 - **Trace**: Direkam pada percobaan ulang pertama untuk membantu debugging
 - **Screenshot**: Diambil secara otomatis hanya saat test gagal
+
+
+test 1
